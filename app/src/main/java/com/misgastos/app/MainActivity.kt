@@ -1,6 +1,8 @@
 package com.misgastos.app
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -34,6 +36,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+            val trace = Log.getStackTraceString(throwable)
+            try {
+                val intent = Intent(this, CrashActivity::class.java).apply {
+                    putExtra("trace", trace)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+            } finally {
+                android.os.Process.killProcess(android.os.Process.myPid())
+                kotlin.system.exitProcess(1)
+            }
+        }
+
         setContent {
             MisGastosTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
