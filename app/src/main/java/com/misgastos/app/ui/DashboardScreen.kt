@@ -1,15 +1,13 @@
 package com.misgastos.app.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,28 +53,40 @@ fun DashboardScreen(viewModel: ExpenseViewModel) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                item {
-                    KpiCard(
-                        label = "Último mes${if (lastMonth != null) " (${lastMonth})" else ""}",
-                        value = fmt(lastTotal),
-                        delta = if (prevMonth != null) "${if (delta >= 0) "▲" else "▼"} ${"%.1f".format(kotlin.math.abs(delta))}%" else null,
-                        deltaGood = delta < 0
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        KpiCard(
+                            label = "Último mes${if (lastMonth != null) " (${lastMonth})" else ""}",
+                            value = fmt(lastTotal),
+                            delta = if (prevMonth != null) "${if (delta >= 0) "▲" else "▼"} ${"%.1f".format(kotlin.math.abs(delta))}%" else null,
+                            deltaGood = delta < 0
+                        )
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
+                        KpiCard(label = "Promedio mensual", value = fmt(avg))
+                    }
                 }
-                item { KpiCard(label = "Promedio mensual", value = fmt(avg)) }
-                item { KpiCard(label = "Total acumulado", value = fmt(grandTotal)) }
-                item {
-                    KpiCard(
-                        label = "Mayor categoría",
-                        value = topCategory?.label ?: "-",
-                        sub = fmt(topCategoryTotal)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        KpiCard(label = "Total acumulado", value = fmt(grandTotal))
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
+                        KpiCard(
+                            label = "Mayor categoría",
+                            value = topCategory?.label ?: "-",
+                            sub = fmt(topCategoryTotal)
+                        )
+                    }
                 }
             }
         }
