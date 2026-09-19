@@ -1,8 +1,15 @@
 package com.misgastos.app.data
 
-data class Category(val key: String, val label: String, val colorHex: Long)
+enum class MovementType { GASTO, INGRESO }
 
-val CATEGORIES = listOf(
+data class Category(
+    val key: String,
+    val label: String,
+    val colorHex: Long,
+    val type: MovementType = MovementType.GASTO
+)
+
+val EXPENSE_CATEGORIES = listOf(
     Category("arriendo", "Arriendo", 0xFF4F7CFF),
     Category("luz", "Luz", 0xFF22A55A),
     Category("agua", "Agua", 0xFF06B6D4),
@@ -19,6 +26,23 @@ val CATEGORIES = listOf(
     Category("google", "Google", 0xFFEC4899),
     Category("otro", "Otro gasto", 0xFF94A3B8)
 )
+
+val INCOME_CATEGORIES = listOf(
+    Category("sueldo", "Sueldo", 0xFF12B886, MovementType.INGRESO),
+    Category("freelance", "Freelance", 0xFF378ADD, MovementType.INGRESO),
+    Category("ventas", "Ventas", 0xFFEAB308, MovementType.INGRESO),
+    Category("regalo", "Regalo", 0xFFF472B6, MovementType.INGRESO),
+    Category("otro_ingreso", "Otro ingreso", 0xFF94A3B8, MovementType.INGRESO)
+)
+
+// Alias por compatibilidad con el código existente (dashboard/tabla siguen mostrando gastos)
+val CATEGORIES = EXPENSE_CATEGORIES
+val ALL_CATEGORIES = EXPENSE_CATEGORIES + INCOME_CATEGORIES
+
+fun categoriesFor(type: MovementType): List<Category> =
+    if (type == MovementType.GASTO) EXPENSE_CATEGORIES else INCOME_CATEGORIES
+
+fun categoryByKey(key: String): Category? = ALL_CATEGORIES.find { it.key == key }
 
 val MESES = listOf(
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",

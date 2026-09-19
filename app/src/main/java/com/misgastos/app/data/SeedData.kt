@@ -1,5 +1,8 @@
 package com.misgastos.app.data
 
+import java.time.LocalDate
+import java.time.ZoneId
+
 object SeedData {
 
     // Datos reales cargados desde la hoja de calculo original (Enero - Septiembre)
@@ -15,11 +18,33 @@ object SeedData {
         "Septiembre" to mapOf("arriendo" to 1600000.0, "luz" to 0.0, "agua" to 568590.0, "gas" to 0.0, "internet" to 148650.0, "tc_exito" to 1419260.0, "tc_rappi" to 902607.0, "telefonia" to 109980.0, "comida" to 987591.0, "netflix" to 29900.0, "univ_smart" to 294100.0, "adobe" to 166600.0, "capcut" to 59900.0, "google" to 8900.0, "otro" to 42890.0)
     )
 
-    fun toExpenseList(): List<Expense> {
-        val list = mutableListOf<Expense>()
+    private val monthIndex = mapOf(
+        "Enero" to 1, "Febrero" to 2, "Marzo" to 3, "Abril" to 4, "Mayo" to 5, "Junio" to 6,
+        "Julio" to 7, "Agosto" to 8, "Septiembre" to 9, "Octubre" to 10, "Noviembre" to 11, "Diciembre" to 12
+    )
+
+    /** Convierte los totales de ejemplo en movimientos individuales (solo para instalaciones nuevas). */
+    fun toMovementList(): List<Movement> {
+        val year = LocalDate.now().year
+        val list = mutableListOf<Movement>()
         raw.forEach { (month, cats) ->
+            val monthNum = monthIndex[month] ?: 1
+            val dateMillis = LocalDate.of(year, monthNum, 1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
             cats.forEach { (key, amount) ->
-                list.add(Expense(month, key, amount))
+                if (amount > 0.0) {
+                    list.add(
+                        Movement(
+                            type = MovementType.GASTO.name,
+                            categoryKey = key,
+                            amount = amount,
+                            dateMillis = dateMillis,
+                            note = "Ejemplo"
+                        )
+                    )
+                }
             }
         }
         return list
